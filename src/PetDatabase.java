@@ -35,8 +35,11 @@ public class PetDatabase {
             switch(choice){
                 case 1 -> showAllPets();
                 case 2 -> addPets();
+                case 3 -> updatePet();
+                case 4 -> removePet();
                 case 5 -> searchPetsByName();
                 case 6 -> searchPetsByAge();
+                default -> System.out.println("Enter a number (1-7) to choose action.");
             }
         }
     }
@@ -68,6 +71,7 @@ public class PetDatabase {
         }
     }
 
+    // SEARCH NAME
     // Searches through the petList and calls the printTableRow method when the input name matches a Pet in the list
     private static void searchPetsByName() {
         System.out.print("Enter a name to search: ");
@@ -83,6 +87,7 @@ public class PetDatabase {
         printTableFooter(count);
     }
 
+    // SEARCH AGE
     // Searches through the petList and calls the printTableRow method when the input age matches a Pet in the list
     private static void searchPetsByAge() {
         System.out.print("Enter an age to search: ");
@@ -100,6 +105,47 @@ public class PetDatabase {
             }
         }
         printTableFooter(count);
+    }
+
+    // UPDATE PET
+    // Shows the pets. Gets id from user. Gets new name and age. Updates the Pet object with new name and age
+    private static void updatePet() {
+        showAllPets();
+        System.out.print("\n\nEnter the pet ID you want to update: ");
+        int id = getID();
+        while (true) {
+            System.out.print("Enter the new name and age: ");
+            String input = sc.nextLine();
+            String[] inputSplit = input.split(" ");
+            try {   petList.get(id).setName(inputSplit[0]);
+                    petList.get(id).setAge(Integer.parseInt(inputSplit[1]));   break;
+            } catch (ArrayIndexOutOfBoundsException e) {
+                System.out.println("ERROR: Enter name and age seperated by a space.");
+            }
+        }
+    }
+
+    // REMOVE PET
+    // Shows all pets. Gets id from user. Removes the selected pet from the petList
+    private static void removePet(){
+        showAllPets();
+        System.out.print("\n\nEnter the pet ID you want to delete: ");
+        int id = getID();
+        petList.remove(id);
+    }
+
+    // GET ID FROM USER
+    // Method to get id input from user and reduce duplicate code in the update and delete methods
+    // Makes sure id is in correct range.
+    private static int getID(){
+        int id = -1;
+        while (id < 0 || id > petList.size()-1) {
+            try {id = sc.nextInt();sc.nextLine();
+            } catch (InputMismatchException e) {
+                System.out.print("Error: Enter a number for ID: "); sc.nextLine();
+            }
+            if(id<0 || id> petList.size()-1){System.out.print("Please enter an ID in the range 0-"+(petList.size()-1)+": ");}
+        } return id;
     }
 
     // PRINT METHODS
