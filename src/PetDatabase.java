@@ -35,6 +35,8 @@ public class PetDatabase {
             switch(choice){
                 case 1 -> showAllPets();
                 case 2 -> addPets();
+                case 5 -> searchPetsByName();
+                case 6 -> searchPetsByAge();
             }
         }
     }
@@ -64,6 +66,40 @@ public class PetDatabase {
                 System.out.println("ERROR: Enter name and age seperated by a space.");
             }
         }
+    }
+
+    // Searches through the petList and calls the printTableRow method when the input name matches a Pet in the list
+    private static void searchPetsByName() {
+        System.out.print("Enter a name to search: ");
+        String name = sc.next().toLowerCase();
+        printTableHeader();
+        int count = 0;
+        for (int i = 0; i < petList.size(); i++) {
+            if (name.equals(petList.get(i).getName().toLowerCase())) {
+                printTableRow(i, petList.get(i).getName(), petList.get(i).getAge());
+                count++;
+            }
+        }
+        printTableFooter(count);
+    }
+
+    // Searches through the petList and calls the printTableRow method when the input age matches a Pet in the list
+    private static void searchPetsByAge() {
+        System.out.print("Enter an age to search: ");
+        int age;
+        while (true) {
+            try { age = sc.nextInt();   break; }
+            catch (InputMismatchException e) { System.out.print("ERROR: Enter a number for age: "); sc.nextLine(); }
+        }
+        printTableHeader();
+        int count = 0;
+        for (int i = 0; i < petList.size(); i++) {
+            if (age == petList.get(i).getAge()) {
+                printTableRow(i, petList.get(i).getName(), petList.get(i).getAge());
+                count++;
+            }
+        }
+        printTableFooter(count);
     }
 
     // PRINT METHODS
