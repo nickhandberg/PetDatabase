@@ -18,6 +18,7 @@ public class PetDatabase {
     public static void main(String[] args){
         int choice = 0;
 
+        // If the pet file already exists, loads the pets to the petList
         if(petFile.exists()){
             try{
                 loadFile();
@@ -46,7 +47,6 @@ public class PetDatabase {
                 try{ choice = sc.nextInt();  break; }
                 catch(InputMismatchException e){ System.out.println("Please enter a number: "); }
             }
-
             switch(choice){
                 case 1 -> showAllPets();
                 case 2 -> addPets();
@@ -59,6 +59,8 @@ public class PetDatabase {
                 }
             }
         }
+
+        // Saves the pets to file at end of main method
         try{
             saveToFile();
         }catch(FileNotFoundException e){
@@ -82,14 +84,24 @@ public class PetDatabase {
         String input;
         sc.nextLine();
         while (true) {
-            System.out.print("add pet (name, age): ");
-            input = sc.nextLine();
-            if (input.equals("done")) { break; }
-            String[] inputSplit = input.split(" ");
-            try { Pet temp = new Pet(inputSplit[0], Integer.parseInt(inputSplit[1]));
-                petList.add(temp);
-            } catch (ArrayIndexOutOfBoundsException e) {
-                System.out.println("ERROR: Enter name and age seperated by a space.");
+            // Checks if the list size is 5, if so breaks the loop not letting the user enter more pets
+            if(petList.size()==5){
+                System.out.println("\nPet database only supports 5 pets.");
+                break;
+            }else{
+                System.out.print("add pet (name, age): ");
+                input = sc.nextLine();
+                if (input.equals("done")) { break; }
+
+                //Checks if the input is valid. If so, adds the pet to the list
+                String [] inputSplit = validateInput(input);
+                if(!inputSplit[0].equals("")){
+                    try { Pet temp = new Pet(inputSplit[0], Integer.parseInt(inputSplit[1]));
+                        petList.add(temp);
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        System.out.println("ERROR: Enter name and age seperated by a space.");
+                    }
+                }
             }
         }
     }
@@ -139,11 +151,15 @@ public class PetDatabase {
         while (true) {
             System.out.print("Enter the new name and age: ");
             String input = sc.nextLine();
-            String[] inputSplit = input.split(" ");
-            try {   petList.get(id).setName(inputSplit[0]);
+
+            //Checks if the input is valid. If so, updates the pet
+            String [] inputSplit = validateInput(input);
+            if(!inputSplit[0].equals("")){
+                try {   petList.get(id).setName(inputSplit[0]);
                     petList.get(id).setAge(Integer.parseInt(inputSplit[1]));   break;
-            } catch (ArrayIndexOutOfBoundsException e) {
-                System.out.println("ERROR: Enter name and age seperated by a space.");
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    System.out.println("ERROR: Enter name and age seperated by a space.");
+                }
             }
         }
     }
@@ -171,6 +187,24 @@ public class PetDatabase {
         } return id;
     }
 
+
+    // Checks if the user entered only a name and age (Array length 2 after split). Any other input is invalid
+    // Also checks if the age input is in the valid range
+    private static String[] validateInput(String input){
+        String[] inputSplit = input.split(" ");
+        if(inputSplit.length!=2){
+            System.out.println("Error: "+input+" is not a valid input.");
+            return new String[]{""};
+        }
+        int age = Integer.parseInt(inputSplit[1]);
+        if(age<1 || age>20){
+            System.out.println("Error: "+age+" is not a valid input.");
+            return new String[]{""};
+        }
+        return inputSplit;
+    }
+
+    // FILE IN/OUT
     // Saves the petList to a text file in the following format: 'name:age'
     private static void saveToFile() throws FileNotFoundException {
         PrintWriter out = new PrintWriter(petFile);
@@ -179,7 +213,6 @@ public class PetDatabase {
         }
         out.close();
     }
-
     // Loads the pets names and ages from the text file
     // Creates new pet objects using the names and ages and stores them in the petList
     private static void loadFile() throws FileNotFoundException {
