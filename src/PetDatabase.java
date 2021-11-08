@@ -2,6 +2,9 @@
     Nicholas Handberg - handbern@csp.edu
  */
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -10,9 +13,11 @@ public class PetDatabase {
     // Adds scanner for user input and ArrayList to store Pet objects
     static Scanner sc = new Scanner(System.in);
     static ArrayList<Pet> petList = new ArrayList<Pet>();
+    static File petFile = new File("pet.txt");
 
     public static void main(String[] args){
         int choice = 0;
+
 
         // Main program loop. Gets users choice and calls the respective method using switch statement
         while(choice != 7){
@@ -42,6 +47,12 @@ public class PetDatabase {
                 default -> System.out.println("Enter a number (1-7) to choose action.");
             }
         }
+        try{
+            saveToFile();
+        }catch(FileNotFoundException e){
+            System.out.println("File not found. Cannot save.");
+        }
+
     }
 
     // Method calls the respective print methods passing in the Pet object's name and ages
@@ -146,6 +157,14 @@ public class PetDatabase {
             }
             if(id<0 || id> petList.size()-1){System.out.print("Please enter an ID in the range 0-"+(petList.size()-1)+": ");}
         } return id;
+    }
+
+    private static void saveToFile() throws FileNotFoundException {
+        PrintWriter out = new PrintWriter(petFile);
+        for (Pet pet : petList) {
+            out.println(pet.getName() + ":" + pet.getAge());
+        }
+        out.close();
     }
 
     // PRINT METHODS
