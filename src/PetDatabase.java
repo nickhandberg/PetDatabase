@@ -12,25 +12,35 @@ import java.util.Scanner;
 public class PetDatabase {
     // Adds scanner for user input and ArrayList to store Pet objects
     static Scanner sc = new Scanner(System.in);
-    static ArrayList<Pet> petList = new ArrayList<Pet>();
+    static ArrayList<Pet> petList = new ArrayList<>();
     static File petFile = new File("pet.txt");
 
     public static void main(String[] args){
         int choice = 0;
 
-
+        if(petFile.exists()){
+            try{
+                loadFile();
+                System.out.println("Pet file loaded successfully.");
+            }catch(FileNotFoundException e){
+                System.out.println("Could not load file.");
+            }
+        }
         // Main program loop. Gets users choice and calls the respective method using switch statement
         while(choice != 7){
-            System.out.print("\n\nPet Database Program.\n" +
-                    "What would you like to do?\n" +
-                    "1) View all pets\n" +
-                    "2) Add more pets\n" +
-                    "3) Update an existing pet\n" +
-                    "4) Remove an existing pet\n" +
-                    "5) Search pets by name\n" +
-                    "6) Search pets by age\n" +
-                    "7) Exit program\n" +
-                    "Your choice: ");
+            System.out.print("""
+
+
+                    Pet Database Program.
+                    What would you like to do?
+                    1) View all pets
+                    2) Add more pets
+                    3) Update an existing pet
+                    4) Remove an existing pet
+                    5) Search pets by name
+                    6) Search pets by age
+                    7) Exit program
+                    Your choice:\s""");
 
             while(true){
                 try{ choice = sc.nextInt();  break; }
@@ -44,7 +54,9 @@ public class PetDatabase {
                 case 4 -> removePet();
                 case 5 -> searchPetsByName();
                 case 6 -> searchPetsByAge();
-                default -> System.out.println("Enter a number (1-7) to choose action.");
+                default -> {
+                    if(choice!=7){System.out.println("Enter a number (1-7) to choose action.");}
+                }
             }
         }
         try{
@@ -159,12 +171,23 @@ public class PetDatabase {
         } return id;
     }
 
+    // Saves the petList to a text file in the following format: 'name:age'
     private static void saveToFile() throws FileNotFoundException {
         PrintWriter out = new PrintWriter(petFile);
         for (Pet pet : petList) {
             out.println(pet.getName() + ":" + pet.getAge());
         }
         out.close();
+    }
+
+    // Loads the pets names and ages from the text file
+    // Creates new pet objects using the names and ages and stores them in the petList
+    private static void loadFile() throws FileNotFoundException {
+        Scanner fs = new Scanner(petFile);
+        while(fs.hasNextLine()){
+            String[] splitInput = fs.nextLine().split(":");
+            petList.add(new Pet(splitInput[0],Integer.parseInt(splitInput[1])));
+        }
     }
 
     // PRINT METHODS
